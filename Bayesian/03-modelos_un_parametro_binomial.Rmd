@@ -1,0 +1,377 @@
+---
+title: "Modelo Binomial"
+author: 
+- Juan Sosa PhD
+- Email   jcsosam@unal.edu.co
+- GitHub  https://github.com/jstats1702 
+date: ""
+output:
+  html_document:
+    highlight: default
+    number_sections: yes
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Modelo
+
+El modelo para **variables binarias** $y_i\in \{0,1\}$, con $i = 1,\ldots,n$, está dado por
+$$
+\begin{align*}
+y_i\mid\theta &\stackrel{\text{iid}}{\sim}\textsf{Bernoulli}(\theta) \\
+\theta &\sim p(\theta)
+\end{align*}
+$$
+donde $\theta\in(0,1)$.
+
+La **distribución muestral** (distribución condicional conjunta) de $\boldsymbol{y} = (y_1,\ldots,y_n)$ dado $\theta$ es
+$$
+p(\boldsymbol{y}\mid\theta) = \prod_{i=1}^n \theta^{y_i}(1-\theta)^{1-y_i} = \theta^{y}(1-\theta)^{n - y}\,,
+$$
+donde $y = \sum_{i=1}^n y_i$. Esta expresión sugiere que $y$ es un **estadístico suficiente** para $\theta$ (i.e., $y$ contiene toda la información de los datos para hacer inferencia sobre $\theta$). 
+
+Sea $y_1,\ldots,y_n$ una secuencia de variables aleatorias con distribución de probabilidad $f_\theta(y_1,\ldots,y_n)$ que depende de un parámetro desconocido $\theta$. Se dice que el estadístico $t=t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si la distribución condicional de $y_1,\ldots,y_n$ dado $t$ no depende de $\theta$.
+
+**(Teorema de Factorización de Fisher-Neyman.)** $t(y_1,\ldots,y_n)$ es un **estadístico suficiente** para $\theta$ si y sólo si se pueden encontrar dos funciones no negativas $h$ y $g_\theta$ tales que $f_\theta(y_1,\ldots,y_n) = h(y_1,\ldots,y_n)\,g_\theta(t(y_1,\ldots,y_n))$.
+
+Dado que las $y_i$ son condicionalmente i.i.d. dado $\theta$ y $y$ es un estadístico suficiente para $\theta$, entonces se tiene el modelo equivalente
+$$
+\begin{align*}
+y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
+\theta &\sim p(\theta) 
+\end{align*}
+$$
+donde $y\in\{0,\ldots,n\}$.
+
+
+# Familias conjugadas
+
+Una familia de distribuciones $\mathcal{P}$ es **conjugada** para la distribución muestral $p(\boldsymbol{y}\mid\boldsymbol{\theta})$, siempre que $p(\boldsymbol{\theta}\mid \boldsymbol{y}) \in \mathcal{P}$ cuando $p(\boldsymbol{\theta}) \in \mathcal{P}$.
+
+Las previas conjugadas conllevan a **cálculos fáciles de realizar**, pero pueden ser **poco flexibles** para representar información previa.
+
+Sea $y$ una variable aleatoria cuya distribución de probabilidad depende de un solo parámetro $\phi$. Se dice que esta distribución pertenece a la **familia exponencial de un parámetro** si la función de densidad de probabilidad (función de masa de probabilidad) de $y$ se puede expresar como
+$$
+p(y\mid\phi) = h(y)\,c(\phi)\exp{ \left\{ \phi\,t(y) \right\} }
+$$
+donde $h$, $c$ y $t$ son funciones conocidas.
+
+Para distribuciones muestrales pertenecientes la familia exponencial de un parámetro, la **distribución previa conjugada** es de la forma
+$$
+p(\phi) \propto \,c(\phi)^{n_0}\exp{ \left\{ \phi\,n_0\,t_0 \right\} }
+$$
+dado que
+$$
+p(\phi\mid\boldsymbol{y}) \propto c(\phi)^{n_0 + n} \exp{ \left\{ \phi\left[\,n_0\,t_0 + n\,t(\boldsymbol{y}) \right] \right\} }
+$$
+donde $t(\boldsymbol{y}) = \frac{1}{n}\sum_{i=1}^n t(y_i)$. Bajo esta formulación, $n_0$ es una medida de cuán informativa es la distribución previa y $t_0$ es el valor esperado previo de $t(y)$.
+
+En el caso de $y\mid\theta\sim\textsf{Bernoulli}(\theta)$, se tiene que
+$$
+\phi = \log\left(\frac{\theta}{1-\theta}\right)\,,\qquad
+t(y) = y\,,\qquad
+h(y) = 1\,,\qquad
+c(\phi) = (1+e^\phi)^{-1}\,,
+$$
+y por lo tanto,
+$$
+p(\phi) \propto (1+e^\phi)^{-n_0}e^{ \phi\,n_0\,t_0  }
+\quad\Longleftrightarrow\quad
+p(\theta) \propto \theta^{n_0t_0 - 1}(1-\theta)^{n_0(1-t_0) - 1}
+\quad\Longleftrightarrow\quad \theta\sim\textsf{Beta}(n_0t_0,n_0(1-t_0))
+$$
+donde $t_0$ es el valor esperado previo de $y$, que en este caso corresponde a la probabilidad previa de que $y=1$.
+
+
+# Modelo Beta-Binomial 
+
+La familia de distribuciones **Beta** es **conjugada** para la distribución muestral **Binomial**.
+
+El **modelo Beta-Binomial** es
+$$
+\begin{align*}
+y\mid\theta &\sim \textsf{Binomial}(n,\theta) \\
+\theta &\sim \textsf{Beta}(a,b)
+\end{align*}
+$$
+donde $a$ y $b$ son los **hiperparámetros** (cantidades fijas conocidas) del modelo. 
+
+Los hiperparámetros se eligen de tal forma que la distribución previa refleje el **estado de información externo** al conjunto de datos. 
+
+
+### Distribución posterior {-}
+
+La **distribución posterior** de $\theta$ es
+$$
+\theta\mid y \sim \textsf{Beta}(\theta\mid a + y, b+n-y)\,.
+$$
+
+
+### Distribución marginal {-}
+
+La **distribución marginal** de $y$ es 
+$$
+  p(y) = \frac{\Gamma(n+1)}{\Gamma(y+1)\Gamma(n-y+1)}\,\frac{\Gamma(a+b)}{\Gamma(a)\,\Gamma(b)}\,\frac{\Gamma(a+y)\,\Gamma(b+n-y)}{\Gamma(a+b+n)}\,,\quad y\in\{0,\ldots,n\}\,.
+$$
+
+Esta distribución se conoce como **distribución Beta Binomial** con parámetros $n\in\mathbb{N}$, $a>0$ y $b>0$, lo que se denota con $y\sim\textsf{Beta-Binomial}(n,a,b)$. 
+
+Esta distribución es un promedio ponderado (mezcla) de distribuciones Binomiales, ponderadas por la distribución Beta.   
+
+
+### Media posterior {-}
+
+La **media posterior** es
+$$
+\textsf{E}(\theta\mid y) = \frac{a+y}{a+b+n} = \frac{a+b}{a+b+n}\cdot\frac{a}{a+b}+\frac{n}{a+b+n}\cdot\frac{y}{n}\,,
+$$
+la cual es un **promedio ponderado** de la media previa $\textsf{E}(\theta) = \frac{a}{a+b}$ y la media muestral $\bar{y} = \frac{y}{n}$ con pesos proporcionales a $a+b$ y $n$, respectivamente. 
+
+Esta expresión conlleva a la siguiente interpretación de los hiperparámetros: 
+
+- $a+b$ = tamaño muestral previo.
+- $a$ = número previo de 1's.
+- $b$ = número previo de 0's. 
+- Si $n >> a+b$, entonces la mayoría de la información proviene de los datos en lugar de la información previa. 
+
+
+### Predicción {-}
+
+La **distribución predictiva posterior** de una observación futura $y^*\in\{0,1\}$ es 
+$$
+y^*\mid y \sim \textsf{Bernoulli}\left( \frac{a+y}{a+b+n} \right)\,.
+$$
+
+La distribución predictiva posterior depende de los datos, mas **no depende** de cantidades desconocidas.
+
+
+### Intervalos de credibilidad {-}
+
+Se quiere identificar **regiones del espacio de parámetros** que con alta probabilidad contengan el valor del parámetro de interés.
+
+Se dice que el **intervalo de credibilidad**  $(l,u)$ tiene una **cobertura Bayesiana** del $100(1-\alpha)\%$ para $\theta$, con $0 < \alpha < 1$, si
+$$
+\textsf{Pr}(l < \theta < u\mid\boldsymbol{y}) = 1-\alpha\,.
+$$
+
+Este intervalo describe el estado de información acerca de la localización $\theta$ **después** de observar los datos.
+
+Esta interpretación es radicalmente diferente de la **cobertura frecuentista**, la cual describe la probabilidad de que el intervalo cubra el valor verdadero de $\theta$ **antes** de observar los datos.
+
+La manera más sencilla de obtener intervalos de credibilidad es por medio de los **percentiles de la distribución posterior** de forma que
+$$
+\textsf{Pr}\left(\theta_{\alpha/2} < \theta < \theta_{1-\alpha/2}\mid \boldsymbol{y}\right) = 1-\alpha\,.
+$$
+
+**(Teorema.)** Un intervalo de credibilidad con un nivel de confianza Bayesiano de $(1-\alpha)\%$, también tiene asintóticamente un nivel de confianza frecuentista de $(1-\alpha)\%$ (Hartigan, 1966).
+
+Hartigan, J. A. (1966). **Note on the confidence‐prior of Welch and Peers**. Journal of the Royal Statistical Society: Series B (Methodological), 28(1), 55-56.
+
+
+# Ejemplo: Víctimas violencia sexual
+
+Datos de las víctimas de violencia sexual suministrados por el **Observatorio de Memoria y Conflicto** y el **Centro Nacional de Memoria Histórica** disponibles en este [enlace](https://micrositios.centrodememoriahistorica.gov.co/observatorio/portal-de-datos/base-de-datos/).
+
+Se quiere hacer inferencia sobre la **proporción poblacional de mujeres victimas de violencia sexual en 2016** $\theta$ por medio de un **modelo Beta-Binomial** con una **distribución previa no informativa**.
+
+De acuerdo con [Semana](https://www.semana.com/nacion/articulo/el-918-de-los-abusos-sexuales-en-colombia-pertenecen-a-mujeres/202212/),
+el **91.8%** de los abusos sexuales en Colombia pertenecen a mujeres. ¿Los datos en 2016 apoyan esta afirmación?
+
+
+## Tratamiento de datos {-}
+
+Se define $y_i = 1$ si el individuo $i$ es mujer, y $y_i = 0$ en caso contrario, para $i = 1,\ldots,n$.
+
+```{r}
+# datos
+df <- read.delim("victimas.txt")
+# dimension
+dim(df)
+# variables
+names(df)
+# frecuencias sexo
+table(df$sexo)
+# proporción datos faltantes
+27/15886
+```
+
+
+```{r}
+# codificación
+df <- df[df$sexo != "Sin Informacion",]
+df$sexo[df$sexo == "Mujer" ] <- 1
+df$sexo[df$sexo == "Hombre"] <- 0
+df$sexo <- as.numeric(df$sexo)
+# sexo año 2016
+y <- df[df$agno == 2016, "sexo"]
+# frecuencias sexo año 2016
+table(y)
+# tamaño de muestra
+n <- length(y)
+print(n)
+# estadístico suficiente
+s <- sum(y)
+print(s)
+```
+
+
+## Distribución posterior {-}
+
+
+```{r}
+# hiperparámetros: previa Beta(1,1)
+a <- 1
+b <- 1
+```
+
+
+```{r}
+# parámetros de la posterior
+(ap <- a + s)
+(bp <- b + n - s)
+```
+
+
+```{r, echo=F, fig.align='center'}
+# gráfico
+curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0, to = 1, col = 4, n = 1000, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
+abline(h = 1, col = 1)
+legend("top", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 2, bty = "n")
+```
+
+
+## Inferencia {-}
+
+
+```{r}
+# media posterior
+round(ap/(ap + bp), 3)
+# mediana posterior
+round((ap - 1/3)/(ap + bp - 2/3), 3)
+# moda posterior
+round((ap-1)/(ap + bp - 2), 3)
+# coeficiente de variación
+round(sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))/(ap/(ap + bp)), 3)
+# intervalo de credibilidad al 95%
+round(qbeta(c(.025,.975), shape1 = ap, shape2 = bp), 3)
+# probabilidad previa de que theta > 0.8
+round(pbeta(q = 0.8, shape1 = a, shape2 = b, lower.tail = F), 3)
+# probabilidad posterior de que theta > 0.8
+round(pbeta(q = 0.8, shape1 = ap, shape2 = bp, lower.tail = F), 3)
+```
+
+
+```{r, echo=F}
+# tabla
+out <- c(ap/(ap + bp), 
+         (ap - 1/3)/(ap + bp - 2/3), 
+         (ap-1)/(ap + bp - 2),
+         sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))/(ap/(ap + bp)), 
+         qbeta(c(.025,.975), shape1 = ap, shape2 = bp))
+names(out) <- c("Media","Mediana","Moda","CV","Q2.5%","Q97.5%")
+knitr::kable(x = t(out), digits = 3, align = "c", caption = "Inferencia sobre proporción poblacional de mujeres victimas de violencia sexual en 2016.")
+```
+
+
+```{r, echo=F, fig.align='center'}
+# gráfico 
+curve(expr = dbeta(x, shape1 = ap, shape2 = bp), from = 0.7, to = 1, col = 4, n = 1000, xlab = expression(theta), ylab = expression(paste("p","(",theta," | ",y,")",sep="")))
+abline(h = 1, col = 1)
+legend("topright", legend = c("Previa", "Posterior"), col = c(1, 4), lty = 1, lwd = 1, bty = "n")
+abline(v = qbeta(c(.025,.975), shape1 = ap, shape2 = bp), lty = 4, lwd = 1, col = 2)
+abline(v = ap/(ap + bp), lty = 1, lwd = 1, col = 3)
+legend("topright", legend = c("Previa", "Posterior", "IC 95%", "Media"), col = c(1, 4, 2, 3), lty = 1, lwd = 2, bty = "n")
+```
+
+
+# Ejemplo: Víctimas violencia sexual (cont.)
+
+Repetir el análisis del ejemplo anterior de 2020 a 2021 por medio de **modelos ajustados independientemente.**
+
+```{r, echo=FALSE}
+# hiperparámetros: previa Beta(1,1)
+a <- 1
+b <- 1
+# ajuste del modelo por año
+out <- NULL
+for (agno in c(2000:2021)) {
+      # datos por año
+      y <- df[df$agno == agno, "sexo"]
+      n <- length(y)
+      s <- sum(y)
+      # parámetros de la posterior
+      ap <- a + s 
+      bp <- b + n - s
+      # media, desviación estándar, intervalo de credibilidad
+      me <- ap/(ap + bp)
+      de <- sqrt((ap*bp)/((ap + bp)^2*(ap + bp + 1)))
+      ic95 <- qbeta(c(.025,.975), shape1 = ap, shape2 = bp)
+      ic99 <- qbeta(c(.005,.995), shape1 = ap, shape2 = bp)
+      # almacenar
+      out <- rbind(out, c(agno, n, me, de/me, ic95, ic99))
+}
+```
+
+
+```{r, echo=F}
+# tabla
+colnames(out) <- c("Año","n","Media","CV","Q2.5%","Q97.5%","Q0.5%","Q99.5%")
+knitr::kable(x = out[,c(1:6)], digits = 3, align = "c", caption = "Inferencia sobre proporción poblacional de mujeres victimas de violencia sexual en 2020-2021.")
+```
+
+
+```{r, echo=F, fig.align='center'}
+# gráfico: tamaños de muestra
+plot(x = 1:nrow(out), y = out[,2], ylim = c(0,1550), pch = 20, xaxt = "n", xlab = "Año", ylab = "Tamaño de muestra")
+abline(v = 1:nrow(out), col = "gray95")
+lines(x = 1:nrow(out), y = out[,2], type = "p", pch = 20)
+lines(x = 1:nrow(out), y = out[,2], type = "l", col = 4)
+axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
+text(x = 1:nrow(out), y = out[,2], labels = out[,2], pos = 3, cex = 0.75)
+```
+
+
+```{r,echo=F, fig.align='center'}
+# gráfico: estimaciones e intervalos
+col <- rep(1, nrow(out))
+col[out[,7] > 0.918] <- 2
+col[out[,8] < 0.918] <- 3
+plot(x = 1:nrow(out), y = out[,3], ylim = c(0.25,1), pch = 16, col = col, xaxt = "n", xlab = "Año", ylab = expression(theta))
+abline(h = 0.918, col = "gray90", lwd = 2)
+lines(x = 1:nrow(out), y = out[,3], type = "l", col = 4)
+lines(x = 1:nrow(out), y = out[,3], type = "p", pch = 16, col = col)
+abline(v = 1:nrow(out), col = "gray95")
+segments(x0 = 1:nrow(out), y0 = out[,5], x1 = 1:nrow(out), y1 = out[,6], col = col, lwd = 2)
+segments(x0 = 1:nrow(out), y0 = out[,7], x1 = 1:nrow(out), y1 = out[,8], col = col, lwd = 1)
+axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
+```
+
+
+```{r, echo=F, fig.align='center'}
+# gráfico: coeficientes de variación
+plot(x = 1:nrow(out), y = out[,4], ylim = c(0,0.2), pch = 20, xaxt = "n", xlab = "Año", ylab = "Coef. Variación")
+abline(v = 1:nrow(out), col = "gray95")
+lines(x = 1:nrow(out), y = out[,4], type = "p", pch = 20)
+lines(x = 1:nrow(out), y = out[,4], type = "l", col = 4)
+axis(side = 1, at = 1:nrow(out), labels = 2000:2021, las = 2)
+abline(h = 0.05, lty = 2, col = 3)
+abline(h = 0.10, lty = 2, col = "#FFA500")
+abline(h = 0.15, lty = 2, col = 2)
+```
+
+
+# Referencias {-}
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Hoffcoverbook.jpg")
+```
+
+
+```{r, eval = TRUE, echo=FALSE, out.width="25%", fig.pos = 'H', fig.align = 'center'}
+knitr::include_graphics("Gelmancoverbook.png")
+```
